@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ISMT College - Modern College Website
 
-## Getting Started
+A professional, responsive college website built with Next.js, TypeScript, and Tailwind CSS. This project is designed for educational purposes as part of a Level 5 Cloud Computing assignment.
 
-First, run the development server:
+## 🚀 Technologies Used
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **Icons**: Lucide React
+- **Deployment Target**: Ubuntu 22.04 Azure Virtual Machine
+- **Process Manager**: PM2
+- **Web Server**: Nginx
+- **SSL**: Certbot (Let's Encrypt)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Installation & Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js 20.x or later
+- npm 10.x or later
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Local Installation
+1. Clone the repository:
+   \`\`\`bash
+   git clone <your-repo-url>
+   cd ismt-college
+   \`\`\`
+2. Install dependencies:
+   \`\`\`bash
+   npm install
+   \`\`\`
+3. Run the development server:
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+## 📦 Production Deployment (Azure VM)
 
-To learn more about Next.js, take a look at the following resources:
+This project is configured for a standard Node.js production environment and does not require Vercel.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 1. Build the Application
+On your Ubuntu VM, run:
+\`\`\`bash
+npm install
+npm run build
+\`\`\`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 2. Run with PM2
+To ensure the application runs continuously in the background:
+\`\`\`bash
+npm install -g pm2
+pm2 start npm --name "ismt-college" -- start
+pm2 save
+pm2 startup
+\`\`\`
 
-## Deploy on Vercel
+### 3. Nginx Reverse Proxy Configuration
+Create an Nginx configuration file:
+\`\`\`bash
+sudo nano /etc/nginx/sites-available/ismt-college
+\`\`\`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Add the following configuration:
+\`\`\`nginx
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+\`\`\`
+
+Enable the site and restart Nginx:
+\`\`\`bash
+sudo ln -s /etc/nginx/sites-available/ismt-college /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+\`\`\`
+
+### 4. SSL with Certbot
+Secure your site with HTTPS:
+\`\`\`bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+\`\`\`
+
+## 📤 GitHub Upload Instructions
+
+1. Create a new repository on GitHub.
+2. Initialize git in your project folder:
+   \`\`\`bash
+   git init
+   git add .
+   git commit -m "Initial commit: Professional College Website"
+   \`\`\`
+3. Link to GitHub and push:
+   \`\`\`bash
+   git remote add origin <your-repo-url>
+   git branch -M main
+   git push -u origin main
+   \`\`\`
+
+## 📂 Project Structure
+
+\`\`\`
+src/
+├── app/                # Next.js App Router (Pages & Layouts)
+│   ├── about/         # About Us page
+│   ├── admissions/    # Admissions page
+│   ├── contact/       # Contact Us page
+│   ├── courses/       # Courses list page
+│   ├── news/          # News & Events page
+│   └── student-life/   # Student Life page
+├── components/        # Reusable UI Components
+│   ├── layout/        # Header, Footer, etc.
+│   └── ui/            # Basic UI elements
+├── constants/         # Static data and configuration
+├── lib/               # Utility functions (cn helper)
+└── types/              # TypeScript type definitions
+\`\`\`
